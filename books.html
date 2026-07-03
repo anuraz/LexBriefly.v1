@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books & Bare Acts | LEX Briefly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-navy': '#071A35',
+                        'royal-blue': '#1E4DFF',
+                        'rich-black': '#0B0B0F',
+                        'gold': '#D4AF37',
+                        'royal-yellow': '#FFD54A',
+                        'light-gray': '#C7D2FE',
+                        'white-text': '#F8FAFC',
+                    },
+                    fontFamily: {
+                        heading: ['Cinzel', 'serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'hero-pattern': 'linear-gradient(to bottom, #071A35, #0B0B0F)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Glassmorphism Utilities */
+        body {
+            background-color: #0B0B0F;
+            color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0B0F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E4DFF;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(7, 26, 53, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(30, 77, 255, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(30, 77, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .glass-header {
+            background: rgba(7, 26, 53, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        /* Sidebar Transitions */
+        .sidebar-expanded {
+            width: 16rem; /* 64 */
+        }
+        .sidebar-collapsed {
+            width: 5rem; /* 20 */
+        }
+        .sidebar-text {
+            transition: opacity 0.2s ease, width 0.2s ease;
+            white-space: nowrap;
+        }
+        .sidebar-collapsed .sidebar-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #1E4DFF;
+            color: #F8FAFC;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #FFD54A;
+            color: #0B0B0F;
+            box-shadow: 0 0 15px rgba(255, 213, 74, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: #F8FAFC;
+            border: 1px solid #D4AF37;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #D4AF37;
+            color: #0B0B0F;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero Particles Canvas */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            right: -5%;
+            bottom: -10%;
+            width: 60%;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+            fill: #D4AF37;
+        }
+    </style>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <aside id="sidebar" class="fixed left-0 top-0 h-screen sidebar-expanded bg-rich-black border-r border-gold/10 z-50 transition-all duration-300 flex flex-col hidden md:flex">
+        <div class="h-20 flex items-center justify-between px-4 border-b border-gold/10">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <i class="ph-fill ph-scales text-3xl text-gold shrink-0"></i>
+                <span class="font-heading font-bold text-xl text-white-text sidebar-text tracking-wide mt-1">LEX Briefly</span>
+            </div>
+            <button id="sidebarToggle" class="text-light-gray hover:text-royal-yellow transition-colors shrink-0 hidden md:block">
+                <i class="ph ph-caret-left text-xl" id="sidebarIcon"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto overflow-x-hidden">
+            <a href="index.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-house text-2xl group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium sidebar-text group-hover:text-royal-yellow transition-colors">Home</span>
+            </a>
+            <a href="resource.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-books text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Resources</span>
+            </a>
+            <a href="books.html" class="flex items-center gap-4 px-3 py-3 rounded-lg bg-royal-blue/10 text-royal-blue group transition-all">
+                <i class="ph ph-book-open-text text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Books & Bare Acts</span>
+            </a>
+            <a href="cases.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-gavel text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Case Laws</span>
+            </a>
+            <a href="internship.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-briefcase text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Internships</span>
+            </a>
+            <a href="news.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-newspaper text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">News & Updates</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gold/10">
+            <a href="#login" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-royal-blue hover:text-white-text group transition-all">
+                <i class="ph ph-sign-in text-2xl group-hover:text-royal-yellow transition-all"></i>
+                <span class="font-medium sidebar-text">Login Panel</span>
+            </a>
+        </div>
+    </aside>
+
+    <div id="mobileDrawer" class="fixed inset-0 bg-rich-black/95 backdrop-blur-md z-[100] transform -translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gold/10">
+            <div class="flex items-center gap-3">
+                <i class="ph-fill ph-scales text-3xl text-gold"></i>
+                <span class="font-heading font-bold text-xl text-white-text mt-1">LEX Briefly</span>
+            </div>
+            <button id="closeDrawerBtn" class="text-light-gray hover:text-white-text">
+                <i class="ph ph-x text-3xl"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-4 p-6 overflow-y-auto">
+            <a href="index.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-house text-2xl"></i> Home</a>
+            <a href="resource.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-books text-gold text-2xl"></i> Resources</a>
+            <a href="books.html" class="text-lg font-medium text-royal-blue flex items-center gap-4"><i class="ph ph-book-open-text text-2xl"></i> Books & Bare Acts</a>
+            <a href="cases.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-gavel text-gold text-2xl"></i> Case Laws</a>
+            <a href="internship.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-briefcase text-gold text-2xl"></i> Internships</a>
+            <a href="news.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-newspaper text-gold text-2xl"></i> News & Updates</a>
+            <a href="#login" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4 mt-6 pt-6 border-t border-gold/10"><i class="ph ph-sign-in text-royal-yellow text-2xl"></i> Login Panel</a>
+        </nav>
+    </div>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen">
+        
+        <header id="topHeader" class="fixed top-0 right-0 left-0 md:left-64 h-20 glass-header z-40 transition-all duration-300">
+            <div class="flex items-center justify-between h-full px-4 md:px-8">
+                
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuBtn" class="md:hidden text-light-gray hover:text-white-text">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                    <div class="hidden md:flex flex-col">
+                        <span class="text-xs font-semibold text-gold tracking-widest uppercase">University of Delhi</span>
+                        <span class="text-sm font-medium text-light-gray">Faculty of Law</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 max-w-xl hidden lg:block mx-8">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <i class="ph ph-magnifying-glass text-light-gray group-focus-within:text-royal-blue transition-colors"></i>
+                        </div>
+                        <input type="text" id="globalSearchInput" class="w-full bg-deep-navy/50 border border-gold/20 text-white-text text-sm rounded-full focus:ring-1 focus:ring-royal-blue focus:border-royal-blue block pl-12 p-3 transition-all placeholder-light-gray/50" placeholder="Search notes, books, case laws...">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4">
+                            <span class="text-xs text-light-gray/50 border border-light-gray/20 rounded px-1.5 py-0.5">Ctrl K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 md:gap-5">
+                    <button class="relative text-light-gray hover:text-royal-yellow transition-colors">
+                        <i class="ph ph-bell text-2xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-royal-yellow rounded-full"></span>
+                    </button>
+                    <button class="lg:hidden text-light-gray hover:text-royal-yellow transition-colors">
+                        <i class="ph ph-magnifying-glass text-2xl"></i>
+                    </button>
+                    <a href="#login" class="hidden sm:flex btn-primary px-5 py-2.5 rounded-full font-medium text-sm items-center gap-2">
+                        <span>Login</span>
+                        <i class="ph ph-arrow-right font-bold"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="pt-20">
+            <section class="relative min-h-[40vh] flex items-center py-16 overflow-hidden bg-hero-pattern border-b border-gold/10">
+                <canvas id="particle-canvas"></canvas>
+                
+                <svg class="watermark" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M224,112h-84.4l-7.3-65.7a8,8,0,0,0-15.9,1.7l7.1,64H40a8,8,0,0,0,0,16H98.9l-19.1,66.8A24,24,0,0,0,103,222.1l1.5-.4A24.1,24.1,0,0,0,120,200l17.7-61.9L155.4,200a24.1,24.1,0,0,0,15.5,21.7l1.5.4a24,24,0,0,0,23.2-27.3l-19.1-66.8H224a8,8,0,0,0,0-16ZM102,192.3l15-52.5,15,52.5a8.1,8.1,0,0,1-5.1,10,8.2,8.2,0,0,1-19.8-10Zm61,10a8.1,8.1,0,0,1-5.1-10l15-52.5,15,52.5a8.2,8.2,0,0,1-19.8,10ZM128,40a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Z"/>
+                </svg>
+
+                <div class="container mx-auto px-6 md:px-12 relative z-10 text-center">
+                    <div class="reveal max-w-3xl mx-auto">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-deep-navy/50 text-gold text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm">
+                            <i class="ph-fill ph-book text-royal-yellow"></i>
+                            Digital Legal Library
+                        </div>
+                        <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 drop-shadow-xl text-white-text">
+                            Books & Bare Acts
+                        </h1>
+                        <p class="text-light-gray/80 text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+                            Access essential law books, reference materials, and Bare Acts in one organized digital library, specifically tailored for LL.B. students.
+                        </p>
+                        
+                        <div class="max-w-xl mx-auto mb-10">
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                                    <i class="ph ph-magnifying-glass text-xl text-light-gray group-focus-within:text-royal-blue transition-colors"></i>
+                                </div>
+                                <input type="text" id="librarySearch" class="w-full bg-deep-navy/40 border border-gold/20 text-white-text text-base rounded-full focus:ring-2 focus:ring-royal-blue focus:border-royal-blue block pl-14 pr-6 p-4 transition-all placeholder-light-gray/40 backdrop-blur-sm shadow-2xl" placeholder="Search Books or Bare Acts...">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <div class="inline-flex p-1.5 bg-deep-navy/80 rounded-xl border border-gold/10 backdrop-blur-md shadow-2xl relative">
+                                <button id="btnToggleBooks" class="px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 bg-royal-blue text-white-text shadow-[0_0_20px_rgba(30,77,255,0.35)]">
+                                    <i class="ph-fill ph-notebook text-lg"></i> Books
+                                </button>
+                                <button id="btnToggleActs" class="px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 text-light-gray hover:text-white-text">
+                                    <i class="ph-fill ph-gavel text-lg"></i> Bare Acts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="booksGridContainer" class="py-16 bg-rich-black transition-opacity duration-300">
+                <div class="container mx-auto px-6 md:px-12">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Law of Contract" data-author="Avtar Singh">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Law of Contract" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Law of Contract</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">Avtar Singh</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Jurisprudence" data-author="V.D. Mahajan">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Jurisprudence" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Jurisprudence</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">V.D. Mahajan</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Law of Torts" data-author="R.K. Bangia">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Law of Torts" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Law of Torts</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">R.K. Bangia</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Family Law" data-author="Paras Diwan">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Family Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Family Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">Paras Diwan</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Constitutional Law" data-author="M.P. Jain">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Constitutional Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Constitutional Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">M.P. Jain</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Company Law" data-author="Avtar Singh">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Company Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Company Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">Avtar Singh</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Administrative Law" data-author="I.P. Massey">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Administrative Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Administrative Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">I.P. Massey</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Property Law" data-author="Poonam Pradhan Saxena">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Property Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Property Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">Poonam Pradhan Saxena</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Criminal Law" data-author="K.D. Gaur">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Criminal Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Criminal Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">K.D. Gaur</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                        <div class="book-card glass-card rounded-2xl p-5 flex flex-col justify-between group reveal" data-name="Labour Law" data-author="S.N. Mishra">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/books/default-book.jpg" alt="Labour Law" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-book-bookmark text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">LEX Digital Library</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-1">Labour Law</h3>
+                                <p class="text-xs text-light-gray/60 mb-4 flex items-center gap-1.5"><i class="ph ph-user"></i> Author: <span class="text-light-gray font-medium">S.N. Mishra</span></p>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download PDF
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <section id="actsGridContainer" class="py-16 bg-rich-black transition-opacity duration-300 hidden opacity-0">
+                <div class="container mx-auto px-6 md:px-12">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Constitution of India">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Constitution of India" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Constitution of India</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Bharatiya Nyaya Sanhita, 2023">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Bharatiya Nyaya Sanhita, 2023" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Bharatiya Nyaya Sanhita, 2023</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Bharatiya Nagarik Suraksha Sanhita, 2023">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Bharatiya Nagarik Suraksha Sanhita, 2023" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Bharatiya Nagarik Suraksha Sanhita, 2023</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Bharatiya Sakshya Adhiniyam, 2023">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Bharatiya Sakshya Adhiniyam, 2023" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Bharatiya Sakshya Adhiniyam, 2023</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Indian Contract Act, 1872">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Indian Contract Act, 1872" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Indian Contract Act, 1872</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Transfer of Property Act, 1882">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Transfer of Property Act, 1882" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Transfer of Property Act, 1882</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Specific Relief Act">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Specific Relief Act" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Specific Relief Act</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Companies Act, 2013">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Companies Act, 2013" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Companies Act, 2013</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Code of Civil Procedure, 1908">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Code of Civil Procedure, 1908" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Code of Civil Procedure, 1908</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Limitation Act, 1963">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Limitation Act, 1963" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Limitation Act, 1963</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Arbitration and Conciliation Act, 1996">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Arbitration and Conciliation Act, 1996" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Arbitration and Conciliation Act, 1996</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Consumer Protection Act, 2019">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Consumer Protection Act, 2019" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Consumer Protection Act, 2019</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Environment Protection Act, 1986">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Environment Protection Act, 1986" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Environment Protection Act, 1986</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Information Technology Act, 2000">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Information Technology Act, 2000" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Information Technology Act, 2000</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                        <div class="act-card glass-card rounded-2xl p-5 flex flex-col justify-between group" data-name="Intellectual Property related Acts">
+                            <div>
+                                <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-deep-navy/60 border border-gold/10 relative mb-4 flex items-center justify-center">
+                                    <img src="images/acts/default-act.jpg" alt="Intellectual Property related Acts" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="absolute inset-0 flex-col items-center justify-center p-4 text-center hidden bg-gradient-to-b from-deep-navy to-rich-black">
+                                        <i class="ph ph-scales text-4xl text-gold mb-2 opacity-60"></i>
+                                        <span class="text-xs font-semibold text-light-gray font-heading">Official Bare Act</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-heading font-bold text-lg text-white-text line-clamp-2 group-hover:text-gold transition-colors mb-4">Intellectual Property related Acts</h3>
+                            </div>
+                            <a href="#" class="w-full btn-secondary py-3 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Download Bare Act
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-rich-black pt-20 pb-6 border-t border-gold/10">
+            <div class="container mx-auto px-6 md:px-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <i class="ph-fill ph-scales text-3xl text-gold"></i>
+                            <span class="font-heading font-bold text-2xl text-white-text tracking-wide mt-1">LEX Briefly</span>
+                        </div>
+                        <p class="text-sm text-light-gray leading-relaxed mb-6">
+                            A centralized legal education platform designed for students of the Faculty of Law, University of Delhi. Simplifying access to academic and career resources.
+                        </p>
+                        <p class="text-xs text-gold uppercase tracking-wider font-semibold">An Initiative by Anurag Sharma</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Quick Links</h4>
+                        <ul class="space-y-3">
+                            <li><a href="index.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Home</a></li>
+                            <li><a href="resource.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Resources</a></li>
+                            <li><a href="books.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Books & Bare Acts</a></li>
+                            <li><a href="cases.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Case Laws</a></li>
+                            <li><a href="internship.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Internships</a></li>
+                            <li><a href="news.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> News & Updates</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Support</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Contact Us</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Privacy Policy</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Terms & Conditions</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> FAQs</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Connect</h4>
+                        <ul class="space-y-4 mb-6">
+                            <li>
+                                <a href="mailto:contact@lexbriefly.com" class="text-sm text-light-gray hover:text-royal-yellow transition-colors flex items-center gap-3">
+                                    <i class="ph ph-envelope-simple text-xl text-royal-blue"></i> contact@lexbriefly.com
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-linkedin-logo text-xl"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-instagram-logo text-xl"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-github-logo text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gold/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-light-gray/60">
+                        © 2026 LEX Briefly. An Initiative by Anurag Sharma. All Rights Reserved.
+                    </p>
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-8 h-8 rounded bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:text-gold transition-colors">
+                        <i class="ph ph-caret-up"></i>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Sidebar Toggle Logic ---
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebarIcon = document.getElementById('sidebarIcon');
+            const mainContent = document.getElementById('mainContent');
+            const topHeader = document.getElementById('topHeader');
+            
+            let isSidebarExpanded = true;
+
+            if(toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isSidebarExpanded = !isSidebarExpanded;
+                    if (isSidebarExpanded) {
+                        sidebar.classList.remove('sidebar-collapsed');
+                        sidebar.classList.add('sidebar-expanded');
+                        sidebarIcon.classList.replace('ph-caret-right', 'ph-caret-left');
+                        mainContent.classList.remove('md:ml-20');
+                        mainContent.classList.add('md:ml-64');
+                        topHeader.classList.remove('md:left-20');
+                        topHeader.classList.add('md:left-64');
+                    } else {
+                        sidebar.classList.remove('sidebar-expanded');
+                        sidebar.classList.add('sidebar-collapsed');
+                        sidebarIcon.classList.replace('ph-caret-left', 'ph-caret-right');
+                        mainContent.classList.remove('md:ml-64');
+                        mainContent.classList.add('md:ml-20');
+                        topHeader.classList.remove('md:left-64');
+                        topHeader.classList.add('md:left-20');
+                    }
+                });
+            }
+
+            // --- Mobile Drawer Logic ---
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileDrawer.classList.remove('-translate-x-full');
+            });
+
+            closeDrawerBtn.addEventListener('click', () => {
+                mobileDrawer.classList.add('-translate-x-full');
+            });
+
+            mobileDrawer.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if(link.getAttribute('href').startsWith('#')) {
+                       mobileDrawer.classList.add('-translate-x-full');
+                    }
+                });
+            });
+
+            // --- Header Scroll Effect ---
+            const header = document.getElementById('topHeader');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    header.classList.add('shadow-lg');
+                    header.style.backgroundColor = 'rgba(7, 26, 53, 0.9)';
+                } else {
+                    header.classList.remove('shadow-lg');
+                    header.style.backgroundColor = 'rgba(7, 26, 53, 0.8)';
+                }
+            });
+
+            // --- Scroll Reveal Animations ---
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+
+            // --- Segmented Tab Navigation and Dynamic Filtering Engine ---
+            const btnBooks = document.getElementById('btnToggleBooks');
+            const btnActs = document.getElementById('btnToggleActs');
+            const booksSection = document.getElementById('booksGridContainer');
+            const actsSection = document.getElementById('actsGridContainer');
+            const searchInput = document.getElementById('librarySearch');
+            
+            let currentActiveTab = 'books';
+
+            function changeTab(targetTab) {
+                if (targetTab === currentActiveTab) return;
+                currentActiveTab = targetTab;
+                
+                if(targetTab === 'books') {
+                    // Update Toggle Navigation Element UI
+                    btnBooks.className = "px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 bg-royal-blue text-white-text shadow-[0_0_20px_rgba(30,77,255,0.35)]";
+                    btnActs.className = "px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 text-light-gray hover:text-white-text";
+                    
+                    // Smooth Switch Animation Layout Workspace
+                    actsSection.classList.add('opacity-0');
+                    setTimeout(() => {
+                        actsSection.classList.add('hidden');
+                        booksSection.classList.remove('hidden');
+                        setTimeout(() => booksSection.classList.remove('opacity-0'), 50);
+                    }, 300);
+                } else {
+                    // Update Toggle Navigation Element UI
+                    btnActs.className = "px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 bg-royal-blue text-white-text shadow-[0_0_20px_rgba(30,77,255,0.35)]";
+                    btnBooks.className = "px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 text-light-gray hover:text-white-text";
+                    
+                    // Smooth Switch Animation Layout Workspace
+                    booksSection.classList.add('opacity-0');
+                    setTimeout(() => {
+                        booksSection.classList.add('hidden');
+                        actsSection.classList.remove('hidden');
+                        setTimeout(() => actsSection.classList.remove('opacity-0'), 50);
+                    }, 300);
+                }
+                
+                // Clear input and run context refresh filter
+                searchInput.value = '';
+                runLiveLibrarySearch();
+            }
+
+            btnBooks.addEventListener('click', () => changeTab('books'));
+            btnActs.addEventListener('click', () => changeTab('acts'));
+
+            function runLiveLibrarySearch() {
+                const searchString = searchInput.value.toLowerCase().trim();
+                
+                if (currentActiveTab === 'books') {
+                    const bookCards = booksSection.querySelectorAll('.book-card');
+                    bookCards.forEach(card => {
+                        const name = card.getAttribute('data-name').toLowerCase();
+                        const author = card.getAttribute('data-author').toLowerCase();
+                        if (name.includes(searchString) || author.includes(searchString)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                } else {
+                    const actCards = actsSection.querySelectorAll('.act-card');
+                    actCards.forEach(card => {
+                        const name = card.getAttribute('data-name').toLowerCase();
+                        if (name.includes(searchString)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+            }
+
+            searchInput.addEventListener('input', runLiveLibrarySearch);
+
+            // --- Particle Canvas Background Engine ---
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = Math.random() * 0.5 - 0.25;
+                    this.speedY = Math.random() * 0.5 - 0.25;
+                    const colors = ['rgba(30, 77, 255, 0.3)', 'rgba(30, 77, 255, 0.5)', 'rgba(212, 175, 55, 0.3)'];
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.y > canvas.height) this.y = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                let numParticles = window.innerWidth < 768 ? 40 : 100;
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+        });
+    </script>
+</body>
+</html>

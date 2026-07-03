@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internships & Opportunities | LEX Briefly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-navy': '#071A35',
+                        'royal-blue': '#1E4DFF',
+                        'rich-black': '#0B0B0F',
+                        'gold': '#D4AF37',
+                        'royal-yellow': '#FFD54A',
+                        'light-gray': '#C7D2FE',
+                        'white-text': '#F8FAFC',
+                    },
+                    fontFamily: {
+                        heading: ['Cinzel', 'serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'hero-pattern': 'linear-gradient(to bottom, #071A35, #0B0B0F)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Glassmorphism Utilities */
+        body {
+            background-color: #0B0B0F;
+            color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0B0F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E4DFF;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+
+        /* Glassmorphism Card System */
+        .glass-card {
+            background: rgba(7, 26, 53, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(30, 77, 255, 0.5);
+            box-shadow: 0 12px 35px -10px rgba(30, 77, 255, 0.35);
+            transform: translateY(-6px) scale(1.01);
+        }
+
+        .glass-header {
+            background: rgba(7, 26, 53, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        /* Sidebar System Transitions */
+        .sidebar-expanded {
+            width: 16rem; /* 64 */
+        }
+        .sidebar-collapsed {
+            width: 5rem; /* 20 */
+        }
+        .sidebar-text {
+            transition: opacity 0.2s ease, width 0.2s ease;
+            white-space: nowrap;
+        }
+        .sidebar-collapsed .sidebar-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Premium Actions & Interactive Layout Buttons */
+        .btn-primary {
+            background-color: #1E4DFF;
+            color: #F8FAFC;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #FFD54A;
+            color: #0B0B0F;
+            box-shadow: 0 0 20px rgba(255, 213, 74, 0.45);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: #F8FAFC;
+            border: 1px solid #D4AF37;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #D4AF37;
+            color: #0B0B0F;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Core Global Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Dynamic Filtering Smooth Classes */
+        .fade-filter {
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Particle System Canvas Elements */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Premium Global Watermarks */
+        .watermark {
+            position: absolute;
+            right: -5%;
+            bottom: -10%;
+            width: 60%;
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 1;
+            fill: #D4AF37;
+        }
+    </style>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <aside id="sidebar" class="fixed left-0 top-0 h-screen sidebar-expanded bg-rich-black border-r border-gold/10 z-50 transition-all duration-300 flex flex-col hidden md:flex">
+        <div class="h-20 flex items-center justify-between px-4 border-b border-gold/10">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <i class="ph-fill ph-scales text-3xl text-gold shrink-0"></i>
+                <span class="font-heading font-bold text-xl text-white-text sidebar-text tracking-wide mt-1">LEX Briefly</span>
+            </div>
+            <button id="sidebarToggle" class="text-light-gray hover:text-royal-yellow transition-colors shrink-0 hidden md:block">
+                <i class="ph ph-caret-left text-xl" id="sidebarIcon"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto overflow-x-hidden">
+            <a href="index.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-house text-2xl group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium sidebar-text group-hover:text-gold transition-colors">Home</span>
+            </a>
+            <a href="resource.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-books text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Resources</span>
+            </a>
+            <a href="books.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-book-open-text text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Books & Bare Acts</span>
+            </a>
+            <a href="cases.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-gavel text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Case Laws</span>
+            </a>
+            <a href="internship.html" class="flex items-center gap-4 px-3 py-3 rounded-lg bg-royal-blue/10 text-royal-blue group transition-all">
+                <i class="ph ph-briefcase text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text group-hover:text-royal-yellow transition-colors">Internships</span>
+            </a>
+            <a href="news.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-newspaper text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">News & Updates</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gold/10">
+            <a href="#login" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-royal-blue hover:text-white-text group transition-all">
+                <i class="ph ph-sign-in text-2xl group-hover:text-royal-yellow transition-all"></i>
+                <span class="font-medium sidebar-text">Login Panel</span>
+            </a>
+        </div>
+    </aside>
+
+    <div id="mobileDrawer" class="fixed inset-0 bg-rich-black/95 backdrop-blur-md z-[100] transform -translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gold/10">
+            <div class="flex items-center gap-3">
+                <i class="ph-fill ph-scales text-3xl text-gold"></i>
+                <span class="font-heading font-bold text-xl text-white-text mt-1">LEX Briefly</span>
+            </div>
+            <button id="closeDrawerBtn" class="text-light-gray hover:text-white-text">
+                <i class="ph ph-x text-3xl"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-4 p-6 overflow-y-auto">
+            <a href="index.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-house text-gold text-2xl"></i> Home</a>
+            <a href="resource.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-books text-gold text-2xl"></i> Resources</a>
+            <a href="books.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-book-open-text text-gold text-2xl"></i> Books & Bare Acts</a>
+            <a href="cases.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-gavel text-gold text-2xl"></i> Case Laws</a>
+            <a href="internship.html" class="text-lg font-medium text-royal-blue flex items-center gap-4"><i class="ph ph-briefcase text-2xl"></i> Internships</a>
+            <a href="news.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-newspaper text-gold text-2xl"></i> News & Updates</a>
+            <a href="#login" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4 mt-6 pt-6 border-t border-gold/10"><i class="ph ph-sign-in text-royal-yellow text-2xl"></i> Login Panel</a>
+        </nav>
+    </div>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen flex flex-col">
+        
+        <header id="topHeader" class="fixed top-0 right-0 left-0 md:left-64 h-20 glass-header z-40 transition-all duration-300">
+            <div class="flex items-center justify-between h-full px-4 md:px-8">
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuBtn" class="md:hidden text-light-gray hover:text-white-text">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                    <div class="hidden md:flex flex-col">
+                        <span class="text-xs font-semibold text-gold tracking-widest uppercase">University of Delhi</span>
+                        <span class="text-sm font-medium text-light-gray">Faculty of Law</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 md:gap-5 ml-auto">
+                    <button class="relative text-light-gray hover:text-royal-yellow transition-colors">
+                        <i class="ph ph-bell text-2xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-royal-yellow rounded-full"></span>
+                    </button>
+                    <a href="#login" class="hidden sm:flex btn-primary px-5 py-2.5 rounded-full font-medium text-sm items-center gap-2">
+                        <span>Login</span>
+                        <i class="ph ph-arrow-right font-bold"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1">
+            <section class="relative pt-32 pb-16 overflow-hidden bg-hero-pattern border-b border-gold/10">
+                <canvas id="particle-canvas"></canvas>
+                
+                <svg class="watermark" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M224,112h-84.4l-7.3-65.7a8,8,0,0,0-15.9,1.7l7.1,64H40a8,8,0,0,0,0,16H98.9l-19.1,66.8A24,24,0,0,0,103,222.1l1.5-.4A24.1,24.1,0,0,0,120,200l17.7-61.9L155.4,200a24.1,24.1,0,0,0,15.5,21.7l1.5.4a24,24,0,0,0,23.2-27.3l-19.1-66.8H224a8,8,0,0,0,0-16ZM102,192.3l15-52.5,15,52.5a8.1,8.1,0,0,1-5.1,10,8.2,8.2,0,0,1-19.8-10Zm61,10a8.1,8.1,0,0,1-5.1-10l15-52.5,15,52.5a8.2,8.2,0,0,1-19.8,10ZM128,40a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Z"/>
+                </svg>
+
+                <div class="container mx-auto px-6 md:px-12 relative z-10 text-center">
+                    <div class="reveal max-w-4xl mx-auto">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-deep-navy/50 text-gold text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm">
+                            <i class="ph-fill ph-briefcase text-royal-yellow"></i>
+                            Career Gateway
+                        </div>
+                        <h1 class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 drop-shadow-xl text-white-text">
+                            Internships & Opportunities
+                        </h1>
+                        <p class="text-light-gray/80 text-base md:text-lg mb-10 max-w-3xl mx-auto leading-relaxed">
+                            Discover internships, legal opportunities, competitions, fellowships, research positions, and career openings curated for LL.B. students.
+                        </p>
+                        
+                        <div class="max-w-2xl mx-auto relative group">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                                <i class="ph ph-magnifying-glass text-2xl text-light-gray group-focus-within:text-royal-blue transition-colors"></i>
+                            </div>
+                            <input type="text" id="opportunitySearchInput" class="w-full bg-deep-navy/60 border border-gold/20 text-white-text text-lg rounded-full focus:ring-2 focus:ring-royal-blue focus:border-royal-blue block pl-14 p-5 transition-all placeholder-light-gray/50 shadow-2xl backdrop-blur-md" placeholder="Search Internship, Organization or Location...">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 bg-rich-black min-h-[50vh]">
+                <div class="container mx-auto px-6 md:px-12">
+                    
+                    <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center fade-filter">
+                        <div class="w-24 h-24 rounded-full bg-deep-navy/50 border border-gold/20 flex items-center justify-center mb-6">
+                            <i class="ph-fill ph-briefcase-metal text-5xl text-light-gray/50"></i>
+                        </div>
+                        <h3 class="font-heading text-2xl font-bold text-white-text mb-2">No internship found.</h3>
+                        <p class="text-light-gray">Try another keyword or organization string.</p>
+                    </div>
+
+                    <div id="internshipsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 items-stretch">
+                        </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-rich-black pt-20 pb-6 border-t border-gold/10 mt-auto">
+            <div class="container mx-auto px-6 md:px-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <i class="ph-fill ph-scales text-3xl text-gold"></i>
+                            <span class="font-heading font-bold text-2xl text-white-text tracking-wide mt-1">LEX Briefly</span>
+                        </div>
+                        <p class="text-sm text-light-gray leading-relaxed mb-6">
+                            A centralized legal education platform designed for students of the Faculty of Law, University of Delhi. Simplifying access to academic and career resources.
+                        </p>
+                        <p class="text-xs text-gold uppercase tracking-wider font-semibold">An Initiative by Anurag Sharma</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Quick Links</h4>
+                        <ul class="space-y-3">
+                            <li><a href="index.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Home</a></li>
+                            <li><a href="resource.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Resources</a></li>
+                            <li><a href="books.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Books & Bare Acts</a></li>
+                            <li><a href="cases.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Case Laws</a></li>
+                            <li><a href="internship.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Internships</a></li>
+                            <li><a href="news.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> News & Updates</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Support</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Contact Us</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Privacy Policy</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Terms & Conditions</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> FAQs</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Connect</h4>
+                        <ul class="space-y-4 mb-6">
+                            <li>
+                                <a href="mailto:contact@lexbriefly.com" class="text-sm text-light-gray hover:text-royal-yellow transition-colors flex items-center gap-3">
+                                    <i class="ph ph-envelope-simple text-xl text-royal-blue"></i> contact@lexbriefly.com
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-linkedin-logo text-xl"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-instagram-logo text-xl"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-github-logo text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gold/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-light-gray/60">
+                        © 2026 LEX Briefly. An Initiative by Anurag Sharma. All Rights Reserved.
+                    </p>
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-8 h-8 rounded bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:text-gold transition-colors">
+                        <i class="ph ph-caret-up"></i>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Data Repository Matrix for Opportunities Configuration Loading Array 
+        const internshipsData = [
+            {
+                title: "Legal Internship",
+                org: "Supreme Court of India",
+                place: "New Delhi",
+                duration: "4 Weeks",
+                stipend: "Unpaid",
+                applyBy: "30 July 2026",
+                desc: "Experience first-hand judicial processes by assisting honorable judges and researchers at the apex court. Responsibilities include conducting comprehensive case law research, drafting concise brief notes, analyzing complex legal briefs, and attending court proceedings. Ideal for advanced LL.B. students with stellar research credentials and analytical skills looking to understand constitutional interpretation and top-tier litigation."
+            },
+            {
+                title: "Judicial Internship",
+                org: "Delhi High Court",
+                place: "New Delhi",
+                duration: "4 Weeks",
+                stipend: "Unpaid",
+                applyBy: "15 August 2026",
+                desc: "Work closely under the guidance of sitting Hon'ble Judges of the High Court of Delhi. Interns will perform rigorous analysis of pending cases, summarize lower court records, prepare judicial briefs, and draft research memos on civil, criminal, and constitutional matters. Requires absolute confidentiality, sharp attention to detail, and top-tier proficiency in digital legal databases like SCC Online and Manupatra."
+            },
+            {
+                title: "District Court Internship",
+                org: "District & Sessions Court",
+                place: "New Delhi",
+                duration: "6 Weeks",
+                stipend: "Performance Based",
+                applyBy: "10 August 2026",
+                desc: "Gain deep practical exposure to trial court mechanics, criminal procedures, and civil litigation strategies. Interns will accompany senior advocates to courtroom hearings, assist in cross-examination frameworks, draft primary trial pleadings, applications, and legal notices, and interact directly with clients. An excellent foundational opportunity for students seeking to master procedural laws, evidence presentation, and grassroots litigation."
+            },
+            {
+                title: "Research Internship",
+                org: "Law Commission of India",
+                place: "New Delhi",
+                duration: "8 Weeks",
+                stipend: "₹5,000/month",
+                applyBy: "05 September 2026",
+                desc: "Engage in high-level legal research aimed at reforming and updating national legislative frameworks. Selected interns will assist the commission in studying outdated statutes, analyzing comparative international laws, preparing comprehensive working papers, and drafting law reform recommendations. Candidates must possess outstanding academic writing skills, deep constitutional knowledge, and a passion for public policy."
+            },
+            {
+                title: "Legal Internship",
+                org: "National Human Rights Commission",
+                place: "New Delhi",
+                duration: "4 Weeks",
+                stipend: "₹8,000/month",
+                applyBy: "20 August 2026",
+                desc: "Learn about systemic human rights advocacy, state accountability, and constitutional protection mechanisms. Interns participate in reviewing human rights violation complaints, researching international covenants, conducting field-study reports, and attending exclusive seminars led by human rights experts. Ideal for students dedicated to public interest law, civil liberties, and international humanitarian legal frameworks."
+            },
+            {
+                title: "Legal Associate Internship",
+                org: "National Legal Services Authority",
+                place: "New Delhi",
+                duration: "4 Weeks",
+                stipend: "Unpaid",
+                applyBy: "25 August 2026",
+                desc: "Contribute actively to legal empowerment and institutional legal aid clinics for marginalized communities. Responsibilities involve assisting in organizing literacy camps, preparing descriptive legal awareness manuals, analyzing institutional legal aid frameworks, and evaluating state-level alternative dispute resolution systems. Perfect for socially conscious students wishing to apply legal knowledge to real-world socio-legal problems."
+            },
+            {
+                title: "SEBI Legal Internship",
+                org: "Securities and Exchange Board of India",
+                place: "Mumbai",
+                duration: "8 Weeks",
+                stipend: "₹10,000/month",
+                applyBy: "12 August 2026",
+                desc: "Immerse yourself in capital markets enforcement, corporate governance rules, and securities law enforcement. Interns will assist the legal affairs department in auditing market compliance, examining corporate disclosure data, researching insider trading precedents, and drafting enforcement briefs. Strong analytical grounding in the Companies Act and financial regulations is highly preferred for this elite position."
+            },
+            {
+                title: "Corporate Legal Internship",
+                org: "Competition Commission of India",
+                place: "New Delhi",
+                duration: "6 Weeks",
+                stipend: "₹15,000/month",
+                applyBy: "18 August 2026",
+                desc: "Analyze anti-competitive agreements, corporate mergers, and abuse of dominant market positions under the Competition Act. Interns conduct comprehensive economic-legal research, draft investigative memos, and analyze market configurations across various tech and traditional sectors. Requires a strong grasp of corporate laws, microeconomics, and analytical reading of multi-jurisdictional precedents."
+            },
+            {
+                title: "Legal Tech AI Internship",
+                org: "Mamla.ai",
+                place: "Remote",
+                duration: "12 Weeks",
+                stipend: "₹12,000/month",
+                applyBy: "01 August 2026",
+                desc: "Explore the intersection of cutting-edge artificial intelligence and professional legal engineering. Interns will work on structuring precise legal data models, training specialized legal LLMs, summarizing landmark judgements for AI ingestion, and evaluating contract automation metrics. A unique opportunity for tech-forward law students aiming to lead the modern revolution in automated legal analytics."
+            },
+            {
+                title: "Corporate Legal Internship",
+                org: "Shardul Amarchand Mangaldas & Co",
+                place: "New Delhi",
+                duration: "4 Weeks",
+                stipend: "Performance Based",
+                applyBy: "22 August 2026",
+                desc: "Work with high-performing corporate teams on cross-border transactions, intellectual property licensing, and structural mergers & acquisitions. Interns conduct thorough commercial due diligence, draft multi-party commercial contracts, analyze capital compliance issues, and draft legal opinions for Fortune 500 clients. Demands deep work ethics, transactional fluency, and solid corporate law foundations."
+            },
+            {
+                title: "NGO Legal Internship",
+                org: "PUCL & Legal Aid Society",
+                place: "Remote",
+                duration: "4 Weeks",
+                stipend: "Unpaid",
+                applyBy: "05 August 2026",
+                desc: "Support strategic public interest litigations and grassroots legal aid campaigns. Interns assist in compiling socio-legal research papers, interviewing affected community members remotely, drafting model public interest petitions, and building community advocacy frameworks. Highly rewarding for individuals looking to gain direct legal insight into environmental defense, gender equality, and labor rights."
+            },
+            {
+                title: "Research Assistant Opportunity",
+                org: "Centre for Policy Research (CPR)",
+                place: "New Delhi",
+                duration: "16 Weeks",
+                stipend: "₹20,000/month",
+                applyBy: "19 August 2026",
+                desc: "Conduct advanced academic research on administrative law modifications, urban planning laws, and environmental policies. Responsibilities include drafting extensive data-backed research chapters, managing extensive stakeholder literature reviews, preparing policy briefs, and organizing academic panels. Excellent preparation for students aiming for international masters programs or legal academia careers."
+            },
+            {
+                title: "Think Tank Internship",
+                org: "Vidhi Centre for Legal Policy",
+                place: "New Delhi",
+                duration: "8 Weeks",
+                stipend: "₹10,000/month",
+                applyBy: "14 August 2026",
+                desc: "Work along with prominent legal policy experts on evaluating judicial reforms, healthcare laws, and digital data protection policies. Interns draft comprehensive independent research briefs, synthesize public consultation feedback, and analyze legislative text structures. Candidates should have exceptional analytical faculties, legal drafting skills, and an interest in public governance frameworks."
+            },
+            {
+                title: "Legal Content Writing Internship",
+                org: "LiveLaw Media Network",
+                place: "Remote",
+                duration: "12 Weeks",
+                stipend: "₹6,000/month",
+                applyBy: "08 August 2026",
+                desc: "Translate highly complex court judgements, legislative developments, and legal debates into accessible, clear, and accurate legal journalism pieces. Interns track daily constitutional benches, draft timely case updates, and craft descriptive analytical articles for thousands of legal readers. Requires exceptional writing speed, crisp language precision, and a reliable understanding of procedural laws."
+            },
+            {
+                title: "Arbitration Internship",
+                org: "Delhi International Arbitration Centre",
+                place: "New Delhi",
+                duration: "4 Weeks",
+                stipend: "Unpaid",
+                applyBy: "29 August 2026",
+                desc: "Experience commercial conflict resolution mechanics inside a premium institutional arbitration environment. Interns observe international and domestic commercial arbitration proceedings, maintain procedural files, research complex choice-of-law principles, and draft detailed award summaries. Essential experience for students tracking careers in dispute resolution and cross-border commercial arbitration."
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('internshipsGrid');
+            
+            // Render Dynamic Component Matrix Function
+            internshipsData.forEach((item, index) => {
+                const card = document.createElement('div');
+                const delay = (index % 3) * 100;
+                
+                card.className = `internship-card glass-card rounded-2xl p-6 md:p-8 flex flex-col h-full group reveal`;
+                card.style.transitionDelay = `${delay}ms`;
+                
+                // Store structural tags data indices for lightning-fast keyword live search operations
+                card.setAttribute('data-title', item.title);
+                card.setAttribute('data-org', item.org);
+                card.setAttribute('data-place', item.place);
+                card.setAttribute('data-desc', item.desc);
+                
+                card.innerHTML = `
+                    <div class="mb-4">
+                        <h3 class="text-2xl font-bold text-white-text font-heading group-hover:text-gold transition-colors leading-tight">${item.title}</h3>
+                        <p class="text-sm text-light-gray/60 font-medium mt-1">Provided by: <span class="text-royal-yellow/90">${item.org}</span></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 my-5 text-xs">
+                        <div class="flex items-center gap-2 bg-deep-navy/30 p-2.5 rounded-xl border border-gold/5 shadow-inner">
+                            <i class="ph ph-map-pin text-royal-blue text-base shrink-0"></i>
+                            <span class="text-light-gray/90 truncate font-medium">${item.place}</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-deep-navy/30 p-2.5 rounded-xl border border-gold/5 shadow-inner">
+                            <i class="ph ph-clock text-royal-blue text-base shrink-0"></i>
+                            <span class="text-light-gray/90 truncate font-medium">${item.duration}</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-deep-navy/30 p-2.5 rounded-xl border border-gold/5 shadow-inner">
+                            <i class="ph ph-currency-inr text-royal-blue text-base shrink-0"></i>
+                            <span class="text-light-gray/90 truncate font-medium">${item.stipend}</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-deep-navy/30 p-2.5 rounded-xl border border-gold/5 shadow-inner">
+                            <i class="ph ph-calendar-blank text-royal-blue text-base shrink-0"></i>
+                            <span class="text-light-gray/90 truncate font-medium">${item.applyBy}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-light-gray/80 leading-relaxed mb-6 flex-1 line-clamp-5 border-t border-gold/5 pt-4">
+                        ${item.desc}
+                    </p>
+
+                    <a href="#" class="mt-auto w-full btn-primary py-3.5 rounded-xl font-medium text-sm inline-flex justify-center items-center gap-2 shadow-lg">
+                        <i class="ph ph-paper-plane-tilt text-base"></i> Apply Now
+                    </a>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Fast Live Input Search Optimization Implementation
+            const searchInput = document.getElementById('opportunitySearchInput');
+            const cards = document.querySelectorAll('.internship-card');
+            const emptyState = document.getElementById('emptyState');
+            let debounceTimer;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    const term = e.target.value.toLowerCase().trim();
+                    let matchFoundCount = 0;
+
+                    cards.forEach(card => {
+                        const title = card.getAttribute('data-title').toLowerCase();
+                        const org = card.getAttribute('data-org').toLowerCase();
+                        const place = card.getAttribute('data-place').toLowerCase();
+                        const desc = card.getAttribute('data-desc').toLowerCase();
+                        
+                        // Clear initialization stagger offsets on interactive inputs
+                        card.style.transitionDelay = '0ms';
+
+                        if (title.includes(term) || org.includes(term) || place.includes(term) || desc.includes(term)) {
+                            card.style.display = 'flex';
+                            card.classList.add('fade-filter');
+                            setTimeout(() => card.classList.remove('fade-filter'), 400);
+                            matchFoundCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    if (matchFoundCount === 0) {
+                        emptyState.classList.remove('hidden');
+                        emptyState.classList.add('flex');
+                    } else {
+                        emptyState.classList.add('hidden');
+                        emptyState.classList.remove('flex');
+                    }
+                }, 150);
+            });
+
+            // --- Layout Engine Synchronized Elements ---
+
+            // Sidebar Layout Manager
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebarIcon = document.getElementById('sidebarIcon');
+            const mainContent = document.getElementById('mainContent');
+            const topHeader = document.getElementById('topHeader');
+            let isSidebarExpanded = true;
+
+            if(toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isSidebarExpanded = !isSidebarExpanded;
+                    if (isSidebarExpanded) {
+                        sidebar.classList.remove('sidebar-collapsed');
+                        sidebar.classList.add('sidebar-expanded');
+                        sidebarIcon.classList.replace('ph-caret-right', 'ph-caret-left');
+                        mainContent.classList.remove('md:ml-20');
+                        mainContent.classList.add('md:ml-64');
+                        topHeader.classList.remove('md:left-20');
+                        topHeader.classList.add('md:left-64');
+                    } else {
+                        sidebar.classList.remove('sidebar-expanded');
+                        sidebar.classList.add('sidebar-collapsed');
+                        sidebarIcon.classList.replace('ph-caret-left', 'ph-caret-right');
+                        mainContent.classList.remove('md:ml-64');
+                        mainContent.classList.add('md:ml-20');
+                        topHeader.classList.remove('md:left-64');
+                        topHeader.classList.add('md:left-20');
+                    }
+                });
+            }
+
+            // Mobile Draw Logic Module Framework
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+
+            if(mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileDrawer.classList.remove('-translate-x-full');
+                });
+            }
+            if(closeDrawerBtn) {
+                closeDrawerBtn.addEventListener('click', () => {
+                    mobileDrawer.classList.add('-translate-x-full');
+                });
+            }
+            mobileDrawer.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if(link.getAttribute('href').startsWith('#')) {
+                       mobileDrawer.classList.add('-translate-x-full');
+                    }
+                });
+            });
+
+            // Header Scroll Dynamics System Management
+            const header = document.getElementById('topHeader');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    header.classList.add('shadow-lg');
+                    header.style.backgroundColor = 'rgba(7, 26, 53, 0.95)';
+                } else {
+                    header.classList.remove('shadow-lg');
+                    header.style.backgroundColor = 'rgba(7, 26, 53, 0.8)';
+                }
+            });
+
+            // Intersection Observers for Scroll Reveal Controls
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = {
+                threshold: 0.05,
+                rootMargin: "0px 0px -10px 0px"
+            };
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                });
+            }, revealOptions);
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+
+            // Particle Canvas Visual Architecture System
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedX = Math.random() * 0.4 - 0.2;
+                    this.speedY = Math.random() * 0.4 - 0.2;
+                    const colors = ['rgba(30, 77, 255, 0.25)', 'rgba(30, 77, 255, 0.45)', 'rgba(212, 175, 55, 0.25)'];
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.y > canvas.height) this.y = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                let numParticles = window.innerWidth < 768 ? 35 : 90;
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+
+            initParticles();
+            animateParticles();
+        });
+    </script>
+</body>
+</html>

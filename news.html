@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal News & Updates | LEX Briefly</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-navy': '#071A35',
+                        'royal-blue': '#1E4DFF',
+                        'rich-black': '#0B0B0F',
+                        'gold': '#D4AF37',
+                        'royal-yellow': '#FFD54A',
+                        'light-gray': '#C7D2FE',
+                        'white-text': '#F8FAFC',
+                    },
+                    fontFamily: {
+                        heading: ['Cinzel', 'serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'hero-pattern': 'linear-gradient(to bottom, #071A35, #0B0B0F)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Glassmorphism Utilities */
+        body {
+            background-color: #0B0B0F;
+            color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0B0F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E4DFF;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(7, 26, 53, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(30, 77, 255, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(30, 77, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .glass-header {
+            background: rgba(7, 26, 53, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        /* Sidebar Transitions */
+        .sidebar-expanded {
+            width: 16rem; /* 64 */
+        }
+        .sidebar-collapsed {
+            width: 5rem; /* 20 */
+        }
+        .sidebar-text {
+            transition: opacity 0.2s ease, width 0.2s ease;
+            white-space: nowrap;
+        }
+        .sidebar-collapsed .sidebar-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #1E4DFF;
+            color: #F8FAFC;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #FFD54A;
+            color: #0B0B0F;
+            box-shadow: 0 0 15px rgba(255, 213, 74, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: #F8FAFC;
+            border: 1px solid #D4AF37;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #D4AF37;
+            color: #0B0B0F;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero Particles Canvas */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            right: -5%;
+            bottom: -10%;
+            width: 60%;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+            fill: #D4AF37;
+        }
+    </style>
+</head>
+<body class="flex bg-rich-black text-white-text selection:bg-royal-blue selection:text-white-text">
+
+    <aside id="sidebar" class="fixed left-0 top-0 h-screen sidebar-expanded bg-rich-black border-r border-gold/10 z-50 transition-all duration-300 flex flex-col hidden md:flex">
+        <div class="h-20 flex items-center justify-between px-4 border-b border-gold/10">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <i class="ph-fill ph-scales text-3xl text-gold shrink-0"></i>
+                <span class="font-heading font-bold text-xl text-white-text sidebar-text tracking-wide mt-1">LEX Briefly</span>
+            </div>
+            <button id="sidebarToggle" class="text-light-gray hover:text-royal-yellow transition-colors shrink-0 hidden md:block">
+                <i class="ph ph-caret-left text-xl" id="sidebarIcon"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto overflow-x-hidden">
+            <a href="index.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-house text-2xl group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium sidebar-text">Home</span>
+            </a>
+            <a href="resource.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-books text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Resources</span>
+            </a>
+            <a href="books.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-book-open-text text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Books & Bare Acts</span>
+            </a>
+            <a href="cases.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-gavel text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Case Laws</span>
+            </a>
+            <a href="internship.html" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-deep-navy hover:text-white-text group transition-all">
+                <i class="ph ph-briefcase text-2xl group-hover:text-gold group-hover:scale-110 transition-all"></i>
+                <span class="font-medium sidebar-text">Internships</span>
+            </a>
+            <a href="news.html" class="flex items-center gap-4 px-3 py-3 rounded-lg bg-royal-blue/10 text-royal-blue group transition-all">
+                <i class="ph ph-newspaper text-2xl group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium sidebar-text group-hover:text-royal-yellow transition-colors">News & Updates</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gold/10">
+            <a href="#login" class="flex items-center gap-4 px-3 py-3 rounded-lg text-light-gray hover:bg-royal-blue hover:text-white-text group transition-all">
+                <i class="ph ph-sign-in text-2xl group-hover:text-royal-yellow transition-all"></i>
+                <span class="font-medium sidebar-text">Login Panel</span>
+            </a>
+        </div>
+    </aside>
+
+    <div id="mobileDrawer" class="fixed inset-0 bg-rich-black/95 backdrop-blur-md z-[100] transform -translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gold/10">
+            <div class="flex items-center gap-3">
+                <i class="ph-fill ph-scales text-3xl text-gold"></i>
+                <span class="font-heading font-bold text-xl text-white-text mt-1">LEX Briefly</span>
+            </div>
+            <button id="closeDrawerBtn" class="text-light-gray hover:text-white-text">
+                <i class="ph ph-x text-3xl"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-4 p-6 overflow-y-auto">
+            <a href="index.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-house text-gold text-2xl"></i> Home</a>
+            <a href="resource.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-books text-gold text-2xl"></i> Resources</a>
+            <a href="books.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-book-open-text text-gold text-2xl"></i> Books & Bare Acts</a>
+            <a href="cases.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-gavel text-gold text-2xl"></i> Case Laws</a>
+            <a href="internship.html" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4"><i class="ph ph-briefcase text-gold text-2xl"></i> Internships</a>
+            <a href="news.html" class="text-lg font-medium text-royal-blue flex items-center gap-4"><i class="ph ph-newspaper text-2xl"></i> News & Updates</a>
+            <a href="#login" class="text-lg font-medium text-light-gray hover:text-white-text flex items-center gap-4 mt-6 pt-6 border-t border-gold/10"><i class="ph ph-sign-in text-royal-yellow text-2xl"></i> Login Panel</a>
+        </nav>
+    </div>
+
+    <div id="mainContent" class="flex-1 transition-all duration-300 md:ml-64 relative min-h-screen flex flex-col justify-between">
+        
+        <header id="topHeader" class="fixed top-0 right-0 left-0 md:left-64 h-20 glass-header z-40 transition-all duration-300">
+            <div class="flex items-center justify-between h-full px-4 md:px-8">
+                
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuBtn" class="md:hidden text-light-gray hover:text-white-text">
+                        <i class="ph ph-list text-3xl"></i>
+                    </button>
+                    <div class="hidden md:flex flex-col">
+                        <span class="text-xs font-semibold text-gold tracking-widest uppercase">University of Delhi</span>
+                        <span class="text-sm font-medium text-light-gray">Faculty of Law</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 max-w-xl hidden lg:block mx-8">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <i class="ph ph-magnifying-glass text-light-gray"></i>
+                        </div>
+                        <input type="text" id="globalNavSearchPlaceholder" disabled class="w-full bg-deep-navy/20 border border-gold/10 text-white-text/40 text-sm rounded-full block pl-12 p-3 cursor-not-allowed" placeholder="Use local search portal below...">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 md:gap-5">
+                    <button class="relative text-light-gray hover:text-royal-yellow transition-colors">
+                        <i class="ph ph-bell text-2xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-royal-yellow rounded-full"></span>
+                    </button>
+                    <button class="lg:hidden text-light-gray hover:text-royal-yellow transition-colors" onclick="document.getElementById('newsSearch').focus();">
+                        <i class="ph ph-magnifying-glass text-2xl"></i>
+                    </button>
+                    <a href="#login" class="hidden sm:flex btn-primary px-5 py-2.5 rounded-full font-medium text-sm items-center gap-2">
+                        <span>Login</span>
+                        <i class="ph ph-arrow-right font-bold"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1">
+            
+            <section class="relative pt-36 pb-16 overflow-hidden bg-hero-pattern border-b border-gold/10">
+                <canvas id="particle-canvas"></canvas>
+                
+                <svg class="watermark" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M224,112h-84.4l-7.3-65.7a8,8,0,0,0-15.9,1.7l7.1,64H40a8,8,0,0,0,0,16H98.9l-19.1,66.8A24,24,0,0,0,103,222.1l1.5-.4A24.1,24.1,0,0,0,120,200l17.7-61.9L155.4,200a24.1,24.1,0,0,0,15.5,21.7l1.5.4a24,24,0,0,0,23.2-27.3l-19.1-66.8H224a8,8,0,0,0,0-16ZM102,192.3l15-52.5,15,52.5a8.1,8.1,0,0,1-5.1,10,8.2,8.2,0,0,1-19.8-10Zm61,10a8.1,8.1,0,0,1-5.1-10l15-52.5,15,52.5a8.2,8.2,0,0,1-19.8,10ZM128,40a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Z"/>
+                </svg>
+
+                <div class="container mx-auto px-6 md:px-12 relative z-10 text-center max-w-4xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-deep-navy/50 text-gold text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-sm reveal">
+                        <i class="ph-fill ph-newspaper text-royal-yellow"></i>
+                        Realtime Information Hub
+                    </div>
+                    
+                    <h1 class="font-heading text-4xl md:text-6xl font-bold leading-tight mb-4 drop-shadow-xl text-white-text reveal">
+                        Legal News & Updates
+                    </h1>
+                    
+                    <p class="text-light-gray/80 text-base md:text-xl mb-10 leading-relaxed max-w-2xl mx-auto reveal">
+                        Latest updates from the legal world, Faculty of Law, Courts, and career opportunities. Stay informed with notices, judgements, and institutional rules.
+                    </p>
+                    
+                    <div class="max-w-2xl mx-auto relative group reveal">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                            <i class="ph ph-magnifying-glass text-xl text-light-gray/60 group-focus-within:text-royal-blue transition-colors"></i>
+                        </div>
+                        <input type="text" id="newsSearch" class="w-full bg-deep-navy/40 backdrop-blur-md border border-gold/30 text-white-text text-base rounded-2xl focus:ring-2 focus:ring-royal-blue focus:border-royal-blue block pl-14 pr-12 p-4 transition-all placeholder-light-gray/40 shadow-inner group-hover:border-gold/50" placeholder="Search News, Notice, Organisation or Keyword...">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-5">
+                            <i class="ph ph-sliders text-xl text-light-gray/40 hover:text-gold cursor-pointer transition-colors"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 bg-rich-black relative">
+                <div class="container mx-auto px-6 md:px-12">
+                    
+                    <div id="newsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-full tracking-wider uppercase">Supreme Court</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-calendar-blank"></i> 17 June 2026
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Supreme Court Redefines the Right to Privacy in Digital Surveillance
+                                </h3 >
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    In a landmark multi-bench decision, the Supreme Court of India expanded structural interpretations of digital autonomy under Article 21. The verdict introduces stringent checks against unchecked metadata tracking, ensuring data privacy standards mirror constitutional mandates for spatial privacy protections.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Supreme Court of India</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full News &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-full tracking-wider uppercase">Internship</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-clock"></i> 2 min read
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Delhi High Court Invites Applications for Judicial Internship
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Registry of the High Court of Delhi has released its notification calling for regular applications for the prestigious Autumn Clerkship and Judicial Internship Cohort. Eligible final-year LL.B. students can apply through the dedicated web portal.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Delhi High Court</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full Notice &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full tracking-wider uppercase">Academics</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-calendar-blank"></i> Yesterday
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Faculty of Law Announces Annual Academic Calendar Released
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Dean's Office has officially published the institutional academic roadmap outlining semester definitions, lecture distribution frameworks, internal assessment timelines, and preparation windows for all upcoming semesters.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Faculty of Law, University of Delhi</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full Notice &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-full tracking-wider uppercase">Competitions</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-clock"></i> 4 min read
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Faculty of Law Announces Annual Moot Court Competition Registration
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Moot Court Society (MCS) is proud to open team registrations for the upcoming flagship National Moot Court Competition. The dynamic case matrix challenges perspectives across overlapping domains of cross-border data protection regulations and algorithmic liabilities.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Faculty of Law, University of Delhi</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full News &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-full tracking-wider uppercase">Exams</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-calendar-blank"></i> 3 days ago
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Examination Schedule Published for LL.B Term-End Exams
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Examination Controller branch has released the formal chronological datesheets for the upcoming semester finals. Candidates are advised to review venue allocations and timings mapped per subject code carefully.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Faculty of Law, University of Delhi</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full Notice &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full tracking-wider uppercase">Academics</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-calendar-blank"></i> 4 days ago
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Semester Results Declared for Re-evaluation Applications
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The updated ledgers capturing alterations arising from the latest semester's audit and re-checking processes are officially online. Appellants can verify their revised credits via the official student dashboard portals.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Faculty of Law, University of Delhi</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full News &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-full tracking-wider uppercase">Internship</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-clock"></i> 3 min read
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    New Internship Opportunity at Law Commission of India
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Law Commission of India has formally released a call for research interns. Selected applicants will gain structural exposure to live tracking of statutory modernization projects and research paradigms under the mentorship of commission experts.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Law Commission of India</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full Notice &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full tracking-wider uppercase">Events</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-calendar-blank"></i> 1 week ago
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Legal Aid Camp Registration Commences for Rural Outreach
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Legal Aid Society invites driven para-legal volunteers to enroll for the upcoming community legal awareness campaign. Participate in providing free assistance clinics across local suburbs under counsel guidance.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Legal Aid Society</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full News &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full tracking-wider uppercase">Bar Council</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-clock"></i> 5 min read
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    Bar Council Announces New Rules for Foreign Law Degree Audits
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    The Bar Council of India updated regulatory resolutions modernizing assessment protocols for recognizing legal titles earned abroad. The modifications refine alignment frameworks governing international qualification validation metrics.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Bar Council of India</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full News &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="news-card glass-card rounded-[20px] p-6 md:p-8 flex flex-col justify-between reveal">
+                            <div>
+                                <div class="flex items-center justify-between mb-5">
+                                    <span class="text-xs font-bold px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full tracking-wider uppercase">Events</span>
+                                    <span class="text-xs text-light-gray/60 flex items-center gap-1.5 font-medium">
+                                        <i class="ph ph-calendar-blank"></i> 2 weeks ago
+                                    </span>
+                                </div>
+                                <h3 class="font-heading font-bold text-xl md:text-2xl mb-4 text-white-text tracking-wide leading-snug line-clamp-2 hover:text-royal-yellow transition-colors">
+                                    National Seminar on Constitutional Law and Democratic Frameworks
+                                </h3>
+                                <p class="text-light-gray/70 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-3">
+                                    Distinguished constitutional scholars, advocates, and civil liberties experts are joining the upcoming national symposium to analyze emerging dimensions of democratic safeguards and fundamental rights.
+                                </p>
+                            </div>
+                            <div>
+                                <hr class="border-t border-gold/10 my-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs md:text-sm font-semibold text-gold/80 italic tracking-wide">Faculty of Law, University of Delhi</span>
+                                    <a href="#" class="inline-flex items-center gap-1 text-sm font-medium text-royal-yellow hover:text-white-text hover:gap-2 transition-all duration-300">
+                                        Read Full News &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                    </div>
+
+                    <div id="emptyState" class="hidden text-center py-20 px-4 max-w-md mx-auto reveal">
+                        <div class="w-24 h-24 rounded-full bg-deep-navy/40 border border-gold/20 flex items-center justify-center mx-auto mb-6">
+                            <i class="ph ph-magnifying-glass-minus text-4xl text-gold/60"></i>
+                        </div>
+                        <h4 class="font-heading text-2xl font-bold text-white-text mb-2">No news found.</h4>
+                        <p class="text-light-gray/60 text-sm mb-6">Try another keyword or category to pinpoint relevant legal notices.</p>
+                        <button onclick="document.getElementById('newsSearch').value=''; document.getElementById('newsSearch').dispatchEvent(new Event('input'));" class="btn-secondary px-5 py-2.5 rounded-xl font-medium text-sm">
+                            Clear Active Search Filter
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-rich-black pt-20 pb-6 border-t border-gold/10 relative z-10">
+            <div class="container mx-auto px-6 md:px-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    
+                    <div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <i class="ph-fill ph-scales text-3xl text-gold"></i>
+                            <span class="font-heading font-bold text-2xl text-white-text tracking-wide mt-1">LEX Briefly</span>
+                        </div>
+                        <p class="text-sm text-light-gray leading-relaxed mb-6">
+                            A centralized legal education platform designed for students of the Faculty of Law, University of Delhi. Simplifying access to academic and career resources.
+                        </p>
+                        <p class="text-xs text-gold uppercase tracking-wider font-semibold">An Initiative by Anurag Sharma</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Quick Links</h4>
+                        <ul class="space-y-3">
+                            <li><a href="index.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Home</a></li>
+                            <li><a href="resource.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Resources</a></li>
+                            <li><a href="books.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Books & Bare Acts</a></li>
+                            <li><a href="cases.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Case Laws</a></li>
+                            <li><a href="internship.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Internships</a></li>
+                            <li><a href="news.html" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> News & Updates</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Support</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Contact Us</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Privacy Policy</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> Terms & Conditions</a></li>
+                            <li><a href="#" class="text-sm text-light-gray hover:text-royal-yellow transition-colors inline-flex items-center gap-2"><i class="ph ph-caret-right text-xs"></i> FAQs</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-bold text-white-text mb-6 font-heading">Connect</h4>
+                        <ul class="space-y-4 mb-6">
+                            <li>
+                                <a href="mailto:contact@lexbriefly.com" class="text-sm text-light-gray hover:text-royal-yellow transition-colors flex items-center gap-3">
+                                    <i class="ph ph-envelope-simple text-xl text-royal-blue"></i> contact@lexbriefly.com
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-linkedin-logo text-xl"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-instagram-logo text-xl"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:bg-royal-blue hover:text-white-text hover:border-royal-blue transition-all">
+                                <i class="ph-fill ph-github-logo text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gold/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-light-gray/60">
+                        © 2026 LEX Briefly. An Initiative by Anurag Sharma. All Rights Reserved.
+                    </p>
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-8 h-8 rounded bg-deep-navy border border-gold/20 flex items-center justify-center text-light-gray hover:text-gold transition-colors">
+                        <i class="ph ph-caret-up"></i>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Live Instant Search Filtering Engine implementation ---
+            const searchInput = document.getElementById('newsSearch');
+            const newsCards = document.querySelectorAll('.news-card');
+            const newsGrid = document.getElementById('newsGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const value = e.target.value.toLowerCase().trim();
+                    let matchCount = 0;
+
+                    newsCards.forEach(card => {
+                        // Scan content mapping requirements (Title, Category, Organisation, Description)
+                        const searchContent = card.textContent.toLowerCase();
+                        
+                        if (searchContent.includes(value)) {
+                            card.style.display = 'flex';
+                            matchCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    // Manage Empty View States gracefully
+                    if (matchCount === 0) {
+                        emptyState.classList.remove('hidden');
+                        newsGrid.classList.add('opacity-0', 'pointer-events-none');
+                    } else {
+                        emptyState.classList.add('hidden');
+                        newsGrid.classList.remove('opacity-0', 'pointer-events-none');
+                    }
+                });
+            }
+
+            // --- Sidebar Toggle Logic ---
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebarIcon = document.getElementById('sidebarIcon');
+            const mainContent = document.getElementById('mainContent');
+            const topHeader = document.getElementById('topHeader');
+            
+            let isSidebarExpanded = true;
+
+            if(toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    isSidebarExpanded = !isSidebarExpanded;
+                    if (isSidebarExpanded) {
+                        sidebar.classList.remove('sidebar-collapsed');
+                        sidebar.classList.add('sidebar-expanded');
+                        sidebarIcon.classList.replace('ph-caret-right', 'ph-caret-left');
+                        mainContent.classList.remove('md:ml-20');
+                        mainContent.classList.add('md:ml-64');
+                        topHeader.classList.remove('md:left-20');
+                        topHeader.classList.add('md:left-64');
+                    } else {
+                        sidebar.classList.remove('sidebar-expanded');
+                        sidebar.classList.add('sidebar-collapsed');
+                        sidebarIcon.classList.replace('ph-caret-left', 'ph-caret-right');
+                        mainContent.classList.remove('md:ml-64');
+                        mainContent.classList.add('md:ml-20');
+                        topHeader.classList.remove('md:left-64');
+                        topHeader.classList.add('md:left-20');
+                    }
+                });
+            }
+
+            // --- Mobile Drawer Logic ---
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+
+            if(mobileMenuBtn && closeDrawerBtn && mobileDrawer) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileDrawer.classList.remove('-translate-x-full');
+                });
+
+                closeDrawerBtn.addEventListener('click', () => {
+                    mobileDrawer.classList.add('-translate-x-full');
+                });
+
+                mobileDrawer.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if(link.getAttribute('href').startsWith('#')) {
+                           mobileDrawer.classList.add('-translate-x-full');
+                        }
+                    });
+                });
+            }
+
+            // --- Header Scroll Effect ---
+            const header = document.getElementById('topHeader');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    header.classList.add('shadow-lg');
+                    header.style.backgroundColor = 'rgba(7, 26, 53, 0.9)';
+                } else {
+                    header.classList.remove('shadow-lg');
+                    header.style.backgroundColor = 'rgba(7, 26, 53, 0.8)';
+                }
+            });
+
+            // --- Scroll Reveal Animations ---
+            const reveals = document.querySelectorAll('.reveal');
+            const revealOptions = {
+                threshold: 0.10,
+                rootMargin: "0px 0px -30px 0px"
+            };
+
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                });
+            }, revealOptions);
+
+            reveals.forEach(reveal => {
+                revealOnScroll.observe(reveal);
+            });
+
+            // --- Particle Canvas Background ---
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = canvas.parentElement.offsetHeight;
+                }
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.size = Math.random() * 2 + 0.5;
+                        this.speedX = Math.random() * 0.5 - 0.25;
+                        this.speedY = Math.random() * 0.5 - 0.25;
+                        const colors = ['rgba(30, 77, 255, 0.3)', 'rgba(30, 77, 255, 0.5)', 'rgba(212, 175, 55, 0.3)'];
+                        this.color = colors[Math.floor(Math.random() * colors.length)];
+                    }
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+                        
+                        if (this.x > canvas.width) this.x = 0;
+                        if (this.x < 0) this.x = canvas.width;
+                        if (this.y > canvas.height) this.y = 0;
+                        if (this.y < 0) this.y = canvas.height;
+                    }
+                    draw() {
+                        ctx.fillStyle = this.color;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                function initParticles() {
+                    particles = [];
+                    let numParticles = window.innerWidth < 768 ? 30 : 70;
+                    for (let i = 0; i < numParticles; i++) {
+                        particles.push(new Particle());
+                    }
+                }
+
+                function animateParticles() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                        particles[i].draw();
+                    }
+                    requestAnimationFrame(animateParticles);
+                }
+
+                initParticles();
+                animateParticles();
+            }
+        });
+    </script>
+</body>
+</html>
